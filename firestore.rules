@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isTechnician() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'technician';
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Allow users to read their own data or if authenticated (for admin access)
+      allow read: if isAuthenticated();
+      // Allow users to create their own user document when registering
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update, delete: if isAdmin() || request.auth.uid == userId;
+    }
+    
+    // Equipment collection
+    match /equipment/{equipmentId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin() || isTechnician();
+      allow delete: if isAdmin();
+    }
+    
+    // Alerts collection
+    match /alerts/{alertId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+    
+    // Sensor readings collection
+    match /sensor-readings/{readingId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+  }
+}

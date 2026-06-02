@@ -1,0 +1,156 @@
+<div class="form-container">
+    <div class="form-card fade-in">
+        <div class="form-header">
+            <h1>{{ isEditMode ? 'Modifier l\'équipement' : 'Ajouter un équipement' }}</h1>
+            <p class="text-muted">{{ isEditMode ? 'Modifiez les informations de l\'équipement' : 'Créez un nouvel équipement à suivre' }}</p>
+        </div>
+
+        <form [formGroup]="equipmentForm" (ngSubmit)="onSubmit()" class="equipment-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="name">Nom de l'équipement *</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        formControlName="name" 
+                        class="form-control" 
+                        placeholder="Ex: Compresseur A1"
+                        [class.error]="name?.invalid && name?.touched" />
+                    <div class="form-error" *ngIf="name?.invalid && name?.touched">
+                        <span *ngIf="name?.errors?.['required']">Le nom est requis</span>
+                        <span *ngIf="name?.errors?.['minlength']">Le nom doit contenir au moins 2 caractères</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="type">Type d'équipement *</label>
+                    <input 
+                        type="text" 
+                        id="type" 
+                        formControlName="type" 
+                        class="form-control" 
+                        placeholder="Ex: Compresseur, Pompe, Ventilateur"
+                        [class.error]="type?.invalid && type?.touched" />
+                    <div class="form-error" *ngIf="type?.invalid && type?.touched">
+                        <span *ngIf="type?.errors?.['required']">Le type est requis</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="location">Localisation *</label>
+                    <input 
+                        type="text" 
+                        id="location" 
+                        formControlName="location" 
+                        class="form-control" 
+                        placeholder="Ex: Bâtiment A, Atelier 1"
+                        [class.error]="location?.invalid && location?.touched" />
+                    <div class="form-error" *ngIf="location?.invalid && location?.touched">
+                        <span *ngIf="location?.errors?.['required']">La localisation est requise</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="status">Statut *</label>
+                    <select 
+                        id="status" 
+                        formControlName="status" 
+                        class="form-control"
+                        [class.error]="status?.invalid && status?.touched">
+                        <option [value]="equipmentStatus.OPERATIONAL">Opérationnel</option>
+                        <option [value]="equipmentStatus.WARNING">Avertissement</option>
+                        <option [value]="equipmentStatus.CRITICAL">Critique</option>
+                        <option [value]="equipmentStatus.OFFLINE">Hors ligne</option>
+                    </select>
+                    <div class="form-error" *ngIf="status?.invalid && status?.touched">
+                        <span *ngIf="status?.errors?.['required']">Le statut est requis</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="temperature">Température (°C) *</label>
+                    <input 
+                        type="number" 
+                        id="temperature" 
+                        formControlName="temperature" 
+                        class="form-control" 
+                        placeholder="0"
+                        step="0.1"
+                        [class.error]="temperature?.invalid && temperature?.touched" />
+                    <div class="form-error" *ngIf="temperature?.invalid && temperature?.touched">
+                        <span *ngIf="temperature?.errors?.['required']">La température est requise</span>
+                        <span *ngIf="temperature?.errors?.['min']">La température doit être supérieure ou égale à -50°C</span>
+                        <span *ngIf="temperature?.errors?.['max']">La température doit être inférieure ou égale à 150°C</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="vibration">Vibration (%) *</label>
+                    <input 
+                        type="number" 
+                        id="vibration" 
+                        formControlName="vibration" 
+                        class="form-control" 
+                        placeholder="0"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        [class.error]="vibration?.invalid && vibration?.touched" />
+                    <div class="form-error" *ngIf="vibration?.invalid && vibration?.touched">
+                        <span *ngIf="vibration?.errors?.['required']">La vibration est requise</span>
+                        <span *ngIf="vibration?.errors?.['min']">La vibration doit être supérieure ou égale à 0%</span>
+                        <span *ngIf="vibration?.errors?.['max']">La vibration doit être inférieure ou égale à 100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="lastMaintenance">Dernière maintenance</label>
+                    <input 
+                        type="date" 
+                        id="lastMaintenance" 
+                        formControlName="lastMaintenance" 
+                        class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="nextMaintenance">Prochaine maintenance</label>
+                    <input 
+                        type="date" 
+                        id="nextMaintenance" 
+                        formControlName="nextMaintenance" 
+                        class="form-control" />
+                </div>
+            </div>
+
+            <div class="alert alert-danger" *ngIf="error">
+                {{ error }}
+            </div>
+
+            <div class="form-actions">
+                <button 
+                    type="button" 
+                    class="btn btn-secondary" 
+                    routerLink="/equipment"
+                    [disabled]="loading">
+                    Annuler
+                </button>
+                <button 
+                    type="submit" 
+                    class="btn btn-primary" 
+                    [disabled]="loading || equipmentForm.invalid">
+                    <span *ngIf="!loading">{{ isEditMode ? 'Enregistrer les modifications' : 'Créer l\'équipement' }}</span>
+                    <span *ngIf="loading" class="flex items-center gap-sm">
+                        <div class="spinner-sm"></div>
+                        {{ isEditMode ? 'Enregistrement...' : 'Création...' }}
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

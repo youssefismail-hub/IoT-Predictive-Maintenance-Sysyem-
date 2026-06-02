@@ -1,0 +1,100 @@
+<div class="alerts-container">
+    <div class="page-header">
+        <div>
+            <h1>Alertes</h1>
+            <p class="text-muted">Consultez et gérez toutes les alertes du système</p>
+        </div>
+        <div class="header-actions" *ngIf="unreadCount$ | async as count">
+            <div class="unread-badge" *ngIf="count > 0">
+                {{ count }} non lue{{ count > 1 ? 's' : '' }}
+            </div>
+            <button 
+                *ngIf="count > 0"
+                type="button" 
+                class="btn btn-secondary btn-sm"
+                (click)="markAllAsRead()"
+                [disabled]="loading">
+                Tout marquer comme lu
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar card">
+        <div class="filter-group">
+            <label>Sévérité</label>
+            <select [(ngModel)]="severityFilter" (change)="onSeverityFilterChange()" class="form-control">
+                <option value="all">Toutes</option>
+                <option [value]="AlertSeverity.INFO">Information</option>
+                <option [value]="AlertSeverity.WARNING">Avertissement</option>
+                <option [value]="AlertSeverity.CRITICAL">Critique</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Statut</label>
+            <select [(ngModel)]="readFilter" (change)="onReadFilterChange()" class="form-control">
+                <option value="all">Toutes</option>
+                <option value="unread">Non lues</option>
+                <option value="read">Lues</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Alerts List -->
+    <div *ngIf="filteredAlerts$ | async as alerts; else loadingTemplate">
+        <div *ngIf="alerts.length === 0" class="empty-state card">
+            <h3>Aucune alerte</h3>
+            <p class="text-muted">Aucune alerte ne correspond à vos filtres</p>
+        </div>
+
+        <div *ngFor="let alert of alerts; trackBy: trackByAlertId" 
+             class="alert-item card"
+             [class.unread]="!alert.isRead"
+             [class.critical]="alert.severity === AlertSeverity.CRITICAL"
+             [class.warning]="alert.severity === AlertSeverity.WARNING"
+             [class.info]="alert.severity === AlertSeverity.INFO">
+            
+            <div class="alert-header">
+                <div class="alert-badges">
+                    <span class="badge" [ngClass]="getSeverityClass(alert.severity)">
+                        {{ getSeverityLabel(alert.severity) }}
+                    </span>
+                    <span class="type-badge">{{ getTypeLabel(alert.type) }}</span>
+                    <span class="new-badge" *ngIf="!alert.isRead">Nouveau</span>
+                </div>
+                <button 
+                    *ngIf="!alert.isRead"
+                    class="btn-mark-read" 
+                    (click)="markAsRead(alert)"
+                    [disabled]="loading"
+                    title="Marquer comme lu">
+                    ✓
+                </button>
+            </div>
+
+            <div class="alert-message">
+                {{ alert.message }}
+            </div>
+
+            <div class="alert-footer">
+                <span class="alert-time">{{ formatRelativeTime(alert.createdAt) }}</span>
+                <a *ngIf="alert.equipmentId" 
+                   [routerLink]="['/equipment', alert.equipmentId]" 
+                   class="equipment-link">
+                    {{ alert.equipmentName || 'Voir équipement' }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #loadingTemplate>
+        <div class="loading-state">
+            <p>Chargement des alertes...</p>
+        </div>
+    </ng-template>
+
+    <div class="error-message" *ngIf="error">
+        {{ error }}
+    </div>
+</div>

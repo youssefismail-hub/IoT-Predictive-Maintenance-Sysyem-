@@ -1,0 +1,71 @@
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1>Equipment</h1>
+            <p class="text-muted">Manage and monitor your equipment</p>
+        </div>
+        <a routerLink="/equipment/new" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Equipment
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar card mb-lg">
+        <div class="form-group mb-0">
+            <input type="text" [(ngModel)]="searchTerm" placeholder="Search equipment..." class="form-control" />
+        </div>
+        <div class="form-group mb-0">
+            <select [(ngModel)]="statusFilter" class="form-control">
+                <option value="all">All Status</option>
+                <option [value]="EquipmentStatus.OPERATIONAL">Operational</option>
+                <option [value]="EquipmentStatus.WARNING">Warning</option>
+                <option [value]="EquipmentStatus.CRITICAL">Critical</option>
+                <option [value]="EquipmentStatus.OFFLINE">Offline</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Equipment Grid -->
+    <div class="equipment-grid" *ngIf="equipment$ | async as equipment">
+        <div *ngIf="equipment.length === 0" class="empty-state card">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <h3>No Equipment Found</h3>
+            <p class="text-muted">Get started by adding your first equipment</p>
+            <a routerLink="/equipment/new" class="btn btn-primary mt-md">Add Equipment</a>
+        </div>
+
+        <div *ngFor="let item of equipment | searchFilter:searchTerm:['name', 'location', 'type'] | statusFilter:statusFilter"
+            class="equipment-card card fade-in" [routerLink]="['/equipment', item.id]">
+            <div class="equipment-header">
+                <h3>{{ item.name }}</h3>
+                <span class="badge" [ngClass]="getStatusClass(item.status)">
+                    {{ item.status }}
+                </span>
+            </div>
+            <div class="equipment-info">
+                <div class="info-item">
+                    <span class="label">Type:</span>
+                    <span class="value">{{ item.type }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Location:</span>
+                    <span class="value">{{ item.location }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Temperature:</span>
+                    <span class="value">{{ item.temperature }}°C</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Vibration:</span>
+                    <span class="value">{{ item.vibration }} Hz</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

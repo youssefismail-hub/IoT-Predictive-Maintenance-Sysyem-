@@ -1,0 +1,139 @@
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 var(--spacing-lg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
+
+.navbar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    gap: var(--spacing-xl);
+}
+
+.navbar-brand h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.navbar-menu {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex: 1;
+    justify-content: center;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.nav-link svg {
+    width: 20px;
+    height: 20px;
+}
+
+.nav-link:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.nav-link.active {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.user-info {
+    text-align: right;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+    text-transform: capitalize;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    background: var(--bg-primary);
+}
+
+.main-content.with-nav {
+    padding-top: 0;
+}
+
+@media (max-width: 768px) {
+    .navbar-content {
+        flex-wrap: wrap;
+        height: auto;
+        padding: var(--spacing-md) 0;
+    }
+
+    .navbar-brand {
+        width: 100%;
+        text-align: center;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .navbar-menu {
+        width: 100%;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .nav-link svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .navbar-user {
+        width: 100%;
+        justify-content: center;
+        margin-top: var(--spacing-sm);
+    }
+}
