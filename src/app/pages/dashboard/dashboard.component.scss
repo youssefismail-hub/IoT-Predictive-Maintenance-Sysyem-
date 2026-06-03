@@ -160,3 +160,291 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* IoT Simulator Control Panel */
+.simulator-control-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+}
+
+.simulator-control-panel:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.panel-section.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.title-area {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.title-area h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.iot-pulse-icon {
+    width: 12px;
+    height: 12px;
+    background-color: var(--text-muted);
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+}
+
+.iot-pulse-icon.active {
+    background-color: var(--success);
+}
+
+.iot-pulse-icon.active::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--success);
+    animation: iot-pulse 2s infinite ease-out;
+    opacity: 0;
+}
+
+@keyframes iot-pulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+.btn-toggle {
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Panel Grid */
+.panel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+@media (max-width: 1024px) {
+    .panel-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.info-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--spacing-sm);
+}
+
+.card-subtitle {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-xs);
+}
+
+.api-status-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.online {
+    background-color: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+.status-dot.offline {
+    background-color: var(--danger);
+    box-shadow: 0 0 8px var(--danger);
+}
+
+.status-dot.checking {
+    background-color: var(--warning);
+    box-shadow: 0 0 8px var(--warning);
+}
+
+.status-dot.waking_up {
+    background-color: #f97316;
+    animation: status-pulse-orange 1.5s infinite ease-in-out;
+}
+
+@keyframes status-pulse-orange {
+    0%, 100% {
+        opacity: 0.5;
+        box-shadow: 0 0 2px #f97316;
+    }
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 10px #f97316;
+    }
+}
+
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.text-warning { color: var(--warning); }
+
+.animate-pulse-text {
+    animation: text-pulse 2s infinite ease-in-out;
+}
+
+@keyframes text-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+.latency-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.btn-icon {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 2px var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--bg-hover);
+    border-color: var(--text-muted);
+}
+
+.warning-banner {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+/* Log Card */
+.no-log {
+    font-size: 0.875rem;
+    text-align: center;
+    padding: var(--spacing-md) 0;
+}
+
+.log-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.log-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.875rem;
+    flex-wrap: wrap;
+}
+
+.log-time {
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+.log-eq-name {
+    color: var(--text-primary);
+}
+
+.log-sensors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin: var(--spacing-xs) 0;
+}
+
+.sensor-value-pill {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2px var(--spacing-sm);
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    font-family: monospace;
+}
+
+.log-verdict {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    border-top: 1px dashed var(--border-color);
+    padding-top: var(--spacing-xs);
+}
+
+.verdict-reason {
+    margin-left: var(--spacing-xs);
+    font-size: 0.825rem;
+}

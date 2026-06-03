@@ -6,6 +6,12 @@ export interface Equipment {
     location: string;
     temperature: number;
     vibration: number;
+    airTemp?: number;
+    rotationalSpeed?: number;
+    torque?: number;
+    toolWear?: number;
+    failureProbability?: number;
+    failureType?: number;
     lastMaintenance?: Date;
     nextMaintenance?: Date;
     createdAt: Date;

@@ -4,6 +4,77 @@
         <p class="text-muted">Monitor your equipment and alerts</p>
     </div>
 
+    <!-- IoT Simulator & ML API Control Panel -->
+    <div class="simulator-control-panel fade-in">
+        <div class="panel-section header-section">
+            <div class="title-area">
+                <span class="iot-pulse-icon" [class.active]="simulatorRunning"></span>
+                <h2>IoT Simulation & Machine Learning Diagnostics</h2>
+            </div>
+            <div class="actions-area">
+                <button class="btn btn-toggle" [class.btn-success]="!simulatorRunning" [class.btn-danger]="simulatorRunning" (click)="toggleSimulator()">
+                    {{ simulatorRunning ? '🛑 Stop Simulation' : '▶️ Start Simulation' }}
+                </button>
+            </div>
+        </div>
+
+        <div class="panel-grid">
+            <!-- API Connection Info -->
+            <div class="info-card">
+                <div class="card-subtitle">PREDICTIVE ML MODEL API STATUS</div>
+                <div class="api-status-display">
+                    <span class="status-dot" [ngClass]="apiStatus"></span>
+                    <span class="status-label">
+                        API: 
+                        <strong *ngIf="apiStatus === 'online'" class="text-success">Online</strong>
+                        <strong *ngIf="apiStatus === 'offline'" class="text-danger">Offline (Fallback active)</strong>
+                        <strong *ngIf="apiStatus === 'checking'" class="text-warning">Checking connection...</strong>
+                        <strong *ngIf="apiStatus === 'waking_up'" class="text-warning animate-pulse-text">Waking up (Spinning up container...)</strong>
+                    </span>
+                    <button class="btn btn-sm btn-icon" (click)="checkApiHealth()" [disabled]="apiStatus === 'checking'">
+                        🔄 Ping
+                    </button>
+                </div>
+                <div class="latency-info" *ngIf="lastPingTime !== null">
+                    Response time: <strong>{{ lastPingTime }}ms</strong>
+                </div>
+                <div class="warning-banner" *ngIf="apiStatus === 'waking_up'">
+                    ⚠️ <strong>Render Cold-Start Notice</strong>: The API is hosted on Render's free tier and was asleep. It is now spinning up, which can take 30-50 seconds. The simulation loop will process updates automatically once the container is fully active.
+                </div>
+            </div>
+
+            <!-- Last Simulation Execution Details -->
+            <div class="info-card log-card">
+                <div class="card-subtitle">LAST LOGGED SIMULATION</div>
+                <div *ngIf="!lastLog" class="no-log text-muted">
+                    No simulation cycles run yet. Click "Start Simulation" to begin telemetry stream.
+                </div>
+                <div *ngIf="lastLog" class="log-details">
+                    <div class="log-header">
+                        <span class="log-time">🕒 {{ lastLog.timestamp | date:'HH:mm:ss' }}</span>
+                        <span class="log-eq-name">Machine: <strong>{{ lastLog.equipmentName }}</strong></span>
+                        <span class="badge" [ngClass]="lastLog.status === 'failure' ? 'badge-danger' : 'badge-success'">
+                            {{ lastLog.status === 'failure' ? 'Anomalie Détectée' : 'Normal' }}
+                        </span>
+                    </div>
+                    <div class="log-sensors">
+                        <div class="sensor-value-pill">Air: {{ lastLog.input.air_temp | number:'1.1-1' }}K</div>
+                        <div class="sensor-value-pill">Proc: {{ lastLog.input.process_temp | number:'1.1-1' }}K</div>
+                        <div class="sensor-value-pill">Speed: {{ lastLog.input.rotational_speed | number:'1.0-0' }} RPM</div>
+                        <div class="sensor-value-pill">Torque: {{ lastLog.input.torque | number:'1.1-1' }}Nm</div>
+                        <div class="sensor-value-pill">Wear: {{ lastLog.input.tool_wear | number:'1.1-1' }}min</div>
+                    </div>
+                    <div class="log-verdict">
+                        Probabilité de panne: <strong [style.color]="lastLog.status === 'failure' ? '#f43f5e' : '#10b981'">{{ (lastLog.result.failure_probability * 100) | number:'1.1-1' }}%</strong>
+                        <span class="verdict-reason" *ngIf="lastLog.result.failure === 1">
+                            - Type: <strong class="text-danger">{{ getFailureTypeName(lastLog.result.failure_type) }}</strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Stats Cards -->
     <div class="grid grid-cols-4 mb-xl">
         <div class="stat-card fade-in">
