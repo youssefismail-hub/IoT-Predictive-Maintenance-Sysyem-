@@ -110,6 +110,13 @@ export class EquipmentService {
                 updatedAt: Timestamp.now()
             };
 
+            // Remove any undefined values to avoid Firestore errors
+            Object.keys(updateData).forEach(key => {
+                if (updateData[key] === undefined) {
+                    delete updateData[key];
+                }
+            });
+
             // Convertir les dates JavaScript en Timestamp Firestore
             if (updateData.lastMaintenance instanceof Date) {
                 updateData.lastMaintenance = Timestamp.fromDate(updateData.lastMaintenance);

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword as createUserWithEmailAndPasswordSecondary } from 'firebase/auth';
 import { environment } from '../../environments/environment';
@@ -15,6 +15,7 @@ import { Role } from '../models/role.model';
 export class AuthService {
     private auth = inject(Auth);
     private firestore = inject(Firestore);
+    private injector = inject(Injector);
     user$: Observable<FirebaseUser | null>;
 
     constructor() {
@@ -23,7 +24,9 @@ export class AuthService {
 
     async register(email: string, password: string, name: string, role: Role = Role.TECHNICIAN): Promise<void> {
         try {
-            const credential = await createUserWithEmailAndPassword(this.auth, email, password);
+            const credential = await runInInjectionContext(this.injector, () => 
+                createUserWithEmailAndPassword(this.auth, email, password)
+            );
             const userDoc: User = {
                 uid: credential.user.uid,
                 email: email,
@@ -77,7 +80,9 @@ export class AuthService {
 
     async login(email: string, password: string): Promise<void> {
         try {
-            await signInWithEmailAndPassword(this.auth, email, password);
+            await runInInjectionContext(this.injector, () => 
+                signInWithEmailAndPassword(this.auth, email, password)
+            );
         } catch (error) {
             console.error('Login error:', error);
             throw error;
@@ -86,7 +91,7 @@ export class AuthService {
 
     async logout(): Promise<void> {
         try {
-            await signOut(this.auth);
+            await runInInjectionContext(this.injector, () => signOut(this.auth));
         } catch (error) {
             console.error('Logout error:', error);
             throw error;
@@ -102,17 +107,19 @@ export class AuthService {
                 // Utiliser docData qui retourne un Observable et reste dans le contexte d'injection
                 // S'assurer que firestore est accessible dans le contexte
                 const userDocRef = doc(this.firestore, `users/${firebaseUser.uid}`);
-                return docData(userDocRef, { idField: 'uid' }).pipe(
-                    map((userData: any) => {
-                        if (userData) {
-                            return {
-                                ...userData,
-                                createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : userData.createdAt
-                            } as User;
-                        }
-                        return null;
-                    })
-                );
+                return runInInjectionContext(this.injector, () => {
+                    return docData(userDocRef, { idField: 'uid' }).pipe(
+                        map((userData: any) => {
+                            if (userData) {
+                                return {
+                                    ...userData,
+                                    createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : userData.createdAt
+                                } as User;
+                            }
+                            return null;
+                        })
+                    );
+                });
             })
         );
     }

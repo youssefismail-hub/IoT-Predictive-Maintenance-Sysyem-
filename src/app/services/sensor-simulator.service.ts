@@ -114,7 +114,7 @@ export class SensorSimulatorService {
             toolWear: parseFloat(input.tool_wear.toFixed(2)),
             status: updatedStatus,
             failureProbability: result.failure_probability,
-            failureType: result.failure_type !== null ? result.failure_type : undefined
+            failureType: result.failure_type ?? undefined
           });
 
           // Log historical reading in Firestore
