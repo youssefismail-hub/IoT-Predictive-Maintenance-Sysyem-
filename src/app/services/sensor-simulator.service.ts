@@ -36,27 +36,23 @@ export class SensorSimulatorService {
     private alertService: AlertService
   ) {}
 
-  /**
-   * Starts the simulation loop
-   */
+  
   startSimulation() {
     if (this.isRunningSubject.value) return;
 
     this.isRunningSubject.next(true);
     console.log('IoT Simulator started');
 
-    // Run first iteration immediately
+   
     this.runSimulationIteration();
 
-    // Set interval for subsequent runs
+    
     this.intervalId = setInterval(() => {
       this.runSimulationIteration();
     }, this.SIMULATION_INTERVAL_MS);
   }
 
-  /**
-   * Stops the simulation loop
-   */
+
   stopSimulation() {
     if (!this.isRunningSubject.value) return;
 
@@ -68,9 +64,7 @@ export class SensorSimulatorService {
     console.log('IoT Simulator stopped');
   }
 
-  /**
-   * Executes a single simulation iteration
-   */
+
   private async runSimulationIteration() {
     try {
       // Get all equipment
@@ -80,17 +74,17 @@ export class SensorSimulatorService {
         return;
       }
 
-      // Pick one equipment at random
+      
       const targetEquipment = equipments[Math.floor(Math.random() * equipments.length)];
       
-      // Check if API is currently online or waking up. If offline, don't execute to avoid spamming errors.
+      
       const apiStatus = await firstValueFrom(this.predictionService.apiStatus$);
       if (apiStatus === 'offline') {
         console.warn('ML API is offline. Skipping simulator iteration.');
         return;
       }
 
-      // Generate simulated telemetry data
+      
       const input = this.generateTelemetry(targetEquipment);
 
       // Query prediction API
@@ -126,7 +120,7 @@ export class SensorSimulatorService {
             timestamp: new Date()
           });
 
-          // Log the simulation event
+          
           const log: SimulationLog = {
             timestamp: new Date(),
             equipmentName: targetEquipment.name,
@@ -136,7 +130,7 @@ export class SensorSimulatorService {
           };
           this.lastLogSubject.next(log);
 
-          // If failure is predicted, spawn a system alert in Firestore
+          
           if (isFailure) {
             const failureName = this.predictionService.getFailureTypeName(result.failure_type);
             await this.alertService.createAlert({
@@ -159,9 +153,7 @@ export class SensorSimulatorService {
     }
   }
 
-  /**
-   * Generates realistic telemetry values, with a small probability of spawning an anomaly.
-   */
+ 
   private generateTelemetry(eq: Equipment): PredictionInput {
     const hasAnomaly = Math.random() < 0.15; // 15% chance of simulating anomaly variables
 

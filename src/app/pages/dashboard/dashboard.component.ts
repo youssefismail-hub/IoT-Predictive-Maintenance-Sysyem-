@@ -60,28 +60,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
             })
         );
 
-        // Subscribe to API status updates
+        
         this.subs.add(
             this.predictionService.apiStatus$.subscribe(status => {
                 this.apiStatus = status;
             })
         );
 
-        // Subscribe to API response latency ping times
+        
         this.subs.add(
             this.predictionService.lastPingTime$.subscribe(ping => {
                 this.lastPingTime = ping;
             })
         );
 
-        // Subscribe to simulator state
+        
         this.subs.add(
             this.simulatorService.isRunning$.subscribe(running => {
                 this.simulatorRunning = running;
             })
         );
 
-        // Subscribe to simulator telemetry logs
+        
         this.subs.add(
             this.simulatorService.lastLog$.subscribe(log => {
                 this.lastLog = log;

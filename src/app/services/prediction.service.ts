@@ -14,7 +14,7 @@ export interface PredictionInput {
 export interface PredictionResult {
   failure_probability: number;
   failure: number; // 0 or 1
-  failure_type: number | null; // 0 to 5 or null
+  failure_type: number | null; 
 }
 
 export type ApiStatus = 'checking' | 'online' | 'waking_up' | 'offline';
@@ -35,10 +35,7 @@ export class PredictionService {
     this.checkApiHealth();
   }
 
-  /**
-   * Pings the API to check its status.
-   * Handles Render's cold-start sleeping state by detecting timeouts or slow responses.
-   */
+
   checkApiHealth(): Observable<boolean> {
     this.apiStatusSubject.next('checking');
     const startTime = Date.now();
@@ -72,10 +69,7 @@ export class PredictionService {
     );
   }
 
-  /**
-   * Submits sensor readings to the ML model for predictive diagnostics.
-   * Handles timeouts and automatically sets status to waking_up if Render takes long.
-   */
+
   getPrediction(data: PredictionInput): Observable<PredictionResult> {
     return this.http.post<PredictionResult>(`${this.apiUrl}/predict`, data).pipe(
       tap(() => {
@@ -94,9 +88,7 @@ export class PredictionService {
     );
   }
 
-  /**
-   * Helper to map failure type codes to human-readable strings
-   */
+
   getFailureTypeName(type: number | null | undefined): string {
     if (type === null || type === undefined) return 'Aucune défaillance';
     const names = [

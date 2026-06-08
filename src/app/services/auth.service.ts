@@ -104,8 +104,7 @@ export class AuthService {
                 if (!firebaseUser) {
                     return of(null);
                 }
-                // Utiliser docData qui retourne un Observable et reste dans le contexte d'injection
-                // S'assurer que firestore est accessible dans le contexte
+                
                 const userDocRef = doc(this.firestore, `users/${firebaseUser.uid}`);
                 return runInInjectionContext(this.injector, () => {
                     return docData(userDocRef, { idField: 'uid' }).pipe(
