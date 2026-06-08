@@ -1,1 +1,38 @@
-<p>settings works!</p>
+<div class="settings-container">
+    <div class="header">
+        <h1>Global Settings</h1>
+        <p class="text-muted">Configure IoT Simulation Thresholds</p>
+    </div>
+
+    <div class="card p-lg fade-in">
+        <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+            <div class="form-group">
+                <label for="criticalTemperature" class="form-label">Critical Temperature (°C)</label>
+                <input type="number" id="criticalTemperature" formControlName="criticalTemperature" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="maxVibration" class="form-label">Max Vibration (mm/s)</label>
+                <input type="number" id="maxVibration" formControlName="maxVibration" class="form-control" step="0.1" />
+            </div>
+
+            <div class="form-group">
+                <label for="simulationFrequencyMs" class="form-label">Simulation Frequency (ms)</label>
+                <input type="number" id="simulationFrequencyMs" formControlName="simulationFrequencyMs" class="form-control" />
+            </div>
+
+            <div *ngIf="successMessage" class="alert alert-success mt-sm">
+                {{ successMessage }}
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger mt-sm">
+                {{ errorMessage }}
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-md" [disabled]="loading || saving || settingsForm.invalid">
+                <span *ngIf="!saving">Save Settings</span>
+                <span *ngIf="saving">Saving...</span>
+            </button>
+        </form>
+    </div>
+</div>

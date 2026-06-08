@@ -1,8 +1,12 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { EquipmentService } from '../../services/equipment.service';
 import { Equipment, EquipmentStatus } from '../../models/equipment.model';
+import { Chart, registerables } from 'chart.js';
+import { Firestore, collection, query, where, orderBy, limit, onSnapshot } from '@angular/fire/firestore';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-equipment-detail',
@@ -17,6 +21,11 @@ export class EquipmentDetailComponent implements OnInit {
   error = '';
   equipmentStatus = EquipmentStatus;
   showDeleteConfirm = false;
+  
+  @ViewChild('sensorChart') chartRef!: ElementRef;
+  private chart: Chart | null = null;
+  private unsubscribeSnapshot: any;
+  private firestore = inject(Firestore);
 
   constructor(
     private equipmentService: EquipmentService,
@@ -42,6 +51,10 @@ export class EquipmentDetailComponent implements OnInit {
       console.log('Loading equipment with id:', id);
       this.equipment = await this.equipmentService.getById(id);
       console.log('Equipment loaded:', this.equipment);
+      
+      if (this.equipment) {
+        this.setupChart();
+      }
       
       if (!this.equipment) {
         this.error = 'Équipement non trouvé';
@@ -161,5 +174,87 @@ export class EquipmentDetailComponent implements OnInit {
     } else {
       return `En retard de ${Math.abs(days)} jours`;
     }
+  }
+
+  ngOnDestroy() {
+    if (this.unsubscribeSnapshot) {
+      this.unsubscribeSnapshot();
+    }
+    if (this.chart) {
+      this.chart.destroy();
+    }
+  }
+
+  setupChart() {
+    if (!this.equipment) return;
+
+    // Use a small timeout to ensure the canvas element is rendered
+    setTimeout(() => {
+      if (!this.chartRef) return;
+      
+      const ctx = this.chartRef.nativeElement.getContext('2d');
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Température (°C)',
+              data: [],
+              borderColor: 'rgb(255, 99, 132)',
+              tension: 0.1
+            },
+            {
+              label: 'Vibration (%)',
+              data: [],
+              borderColor: 'rgb(54, 162, 235)',
+              tension: 0.1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      this.subscribeToReadings();
+    }, 100);
+  }
+
+  subscribeToReadings() {
+    if (!this.equipment) return;
+    
+    const readingsRef = collection(this.firestore, 'sensor-readings');
+    const q = query(
+      readingsRef, 
+      where('equipmentId', '==', this.equipment.id),
+      orderBy('timestamp', 'desc'),
+      limit(10)
+    );
+
+    this.unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+      const readings: any[] = [];
+      snapshot.forEach((doc) => {
+        readings.push(doc.data());
+      });
+      
+      // Reverse to chronological order (oldest first for the chart left-to-right)
+      readings.reverse();
+
+      if (this.chart) {
+        this.chart.data.labels = readings.map(r => {
+          const d = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp);
+          return d.toLocaleTimeString();
+        });
+        this.chart.data.datasets[0].data = readings.map(r => r.temperature);
+        this.chart.data.datasets[1].data = readings.map(r => r.vibration);
+        this.chart.update();
+      }
+    });
   }
 }

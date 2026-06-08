@@ -1,4 +1,7 @@
 import { Injectable, inject } from '@angular/core';
+import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword as createUserWithEmailAndPasswordSecondary } from 'firebase/auth';
+import { environment } from '../../environments/environment';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user, User as FirebaseUser } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, docData } from '@angular/fire/firestore';
 import { Observable, switchMap, of } from 'rxjs';
@@ -33,6 +36,41 @@ export class AuthService {
             await setDoc(doc(this.firestore, `users/${credential.user.uid}`), userDoc);
         } catch (error) {
             console.error('Registration error:', error);
+            throw error;
+        }
+    }
+
+    async registerSecondary(email: string, password: string, name: string, role: Role = Role.TECHNICIAN): Promise<void> {
+        try {
+            let secondaryApp: FirebaseApp;
+            const apps = getApps();
+            const appName = 'temp-register';
+            const foundApp = apps.find(app => app.name === appName);
+            
+            if (foundApp) {
+                secondaryApp = foundApp;
+            } else {
+                secondaryApp = initializeApp(environment.firebase, appName);
+            }
+
+            const secondaryAuth = getAuth(secondaryApp);
+            const credential = await createUserWithEmailAndPasswordSecondary(secondaryAuth, email, password);
+            
+            const userDoc: User = {
+                uid: credential.user.uid,
+                email: email,
+                name: name,
+                role: role,
+                isActive: true,
+                createdAt: new Date()
+            };
+
+            await setDoc(doc(this.firestore, `users/${credential.user.uid}`), userDoc);
+            
+            // Sign out of the secondary app
+            await secondaryAuth.signOut();
+        } catch (error) {
+            console.error('Registration (Secondary) error:', error);
             throw error;
         }
     }

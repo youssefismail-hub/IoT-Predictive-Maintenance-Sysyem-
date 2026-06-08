@@ -43,8 +43,8 @@ export class RegisterComponent {
             this.error = '';
 
             try {
-                const { name, email, password, role } = this.registerForm.value;
-                await this.authService.register(email, password, name, role);
+                const { name, email, password } = this.registerForm.value;
+                await this.authService.register(email, password, name, Role.TECHNICIAN);
                 this.router.navigate(['/dashboard']);
             } catch (error: any) {
                 this.error = error.message || 'Registration failed. Please try again.';

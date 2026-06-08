@@ -20,8 +20,8 @@ service cloud.firestore {
     match /users/{userId} {
       // Allow users to read their own data or if authenticated (for admin access)
       allow read: if isAuthenticated();
-      // Allow users to create their own user document when registering
-      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // Allow users to create their own user document when registering, forced to technician unless created by admin
+      allow create: if (isAuthenticated() && request.auth.uid == userId && request.resource.data.role == 'technician') || isAdmin();
       allow update, delete: if isAdmin() || request.auth.uid == userId;
     }
     
@@ -45,6 +45,12 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
       allow update, delete: if isAdmin();
+    }
+    
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 }

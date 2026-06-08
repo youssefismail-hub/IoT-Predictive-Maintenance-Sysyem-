@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 import { EquipmentService } from './equipment.service';
 import { PredictionService, PredictionInput, PredictionResult } from './prediction.service';
 import { AlertService } from './alert.service';
@@ -26,6 +27,8 @@ export class SensorSimulatorService {
 
   private intervalId: any = null;
   private readonly SIMULATION_INTERVAL_MS = 25000; // 25 seconds interval to avoid rate limiting
+
+  private firestore = inject(Firestore);
 
   constructor(
     private equipmentService: EquipmentService,
@@ -112,6 +115,15 @@ export class SensorSimulatorService {
             status: updatedStatus,
             failureProbability: result.failure_probability,
             failureType: result.failure_type !== null ? result.failure_type : undefined
+          });
+
+          // Log historical reading in Firestore
+          await addDoc(collection(this.firestore, 'sensor-readings'), {
+            equipmentId: targetEquipment.id,
+            temperature: parseFloat(input.process_temp.toFixed(2)),
+            vibration: parseFloat(input.torque.toFixed(2)),
+            pressure: Math.round(input.rotational_speed / 10),
+            timestamp: new Date()
           });
 
           // Log the simulation event

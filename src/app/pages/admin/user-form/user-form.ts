@@ -119,7 +119,7 @@ export class UserFormComponent implements OnInit {
           });
         } else {
           // Création d'un nouvel utilisateur
-          await this.authService.register(
+          await this.authService.registerSecondary(
             formValue.email,
             formValue.password,
             formValue.name,
